@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/theme/white.css">
     <link rel="stylesheet" href="css/theme/custom.css">
     <!-- Theme used for syntax highlighting of code -->
-    <link rel="stylesheet" href="lib/css/zenburn.css">
+    <link rel="stylesheet" href="lib/css/github-gist.css">
     <!-- Printing and PDF exports -->
     <script>
     var link = document.createElement('link');
@@ -25,1671 +25,438 @@
         <div class="slides">
             <section data-background-video="bgm.mp4" data-background-video-loop data-background-video-muted style="text-align: left;">
                 <h2 style="color: white">Python Programming</h2>
-                <h5 style="color: white">Lecture 13 Pandas Basics</h5>
+                <h5 style="color: white">Lecture 13 Wordcloud & Algorithm Intro</h5>
             </section>
             <section>
                 <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">13.1 Pandas (2)</h2>
+                    <h2 style="color: white">13.1 Wordcloud & Encoding</h2>
                 </section>
                 <section>
-                    <h6>Index Objects</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [76]: obj = pd.Series(range(3), index=['a', 'b', 'c'])
-In [77]: index = obj.index
-In [78]: index
-Out[78]: Index(['a', 'b', 'c'], dtype='object')
-In [79]: index[1:]
-Out[79]: Index(['b', 'c'], dtype='object')
-</code></pre>
-                    </div>
-                    <p class="fragment">Index objects are immutable and thus can’t be modified by the user:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [80]: labels = pd.Index(np.arange(3))
-In [81]: labels
-Out[81]: Index([0, 1, 2], dtype='int64')
-In [82]: obj2 = pd.Series([1.5, -2.5, 0], index=labels)
-In [83]: obj2
-Out[83]:
-0 1.5
-1 -2.5
-2 0.0
-dtype: float64
-In [84]: obj2.index is labels
-Out[84]: True
-</code></pre>
-                    </div>
+                    <div class="fragment"><img data-src="wordcloud_ex.png" style="height: 400pt"></div>
                 </section>
                 <section>
+                    <ul>
+                        <li>A long string</li>
+                    </ul>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [85]: frame3
-Out[85]:
-state Nevada Ohio
-year
-2000 NaN 1.5
-2001 2.4 1.7
-2002 2.9 3.6
-In [86]: frame3.columns
-Out[86]: Index(['Nevada', 'Ohio'], dtype='object', name='state')
-In [87]: 'Ohio' in frame3.columns
-Out[87]: True
-In [88]: 2003 in frame3.index
-Out[88]: False
-</code></pre>
-                    </div>
-                    <p class="fragment">a pandas Index can contain duplicate labels:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [89]: dup_labels = pd.Index(['foo', 'foo', 'bar', 'bar'])
-In [90]: dup_labels
-Out[90]: Index(['foo', 'foo', 'bar', 'bar'], dtype='object')
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Essential Functionality</h6>
-                    <p class="fragment">Reindexing</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [91]: obj = pd.Series([4.5, 7.2, -5.3, 3.6], index=['d', 'b', 'a', 'c'])
-In [92]: obj
-Out[92]:
-d 4.5
-b 7.2
-a -5.3
-c 3.6
-dtype: float64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [93]: obj2 = obj.reindex(['a', 'b', 'c', 'd', 'e'])
-In [94]: obj2
-Out[94]:
-a -5.3
-b 7.2
-c 3.6
-d 4.5
-e NaN
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">ffill</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [95]: obj3 = pd.Series(['blue', 'purple', 'yellow'], index=[0, 2, 4])
-In [96]: obj3
-Out[96]:
-0 blue
-2 purple
-4 yellow
-dtype: object
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [97]: obj3.reindex(range(6), method='ffill')
-Out[97]:
-0 blue
-1 blue
-2 purple
-3 purple
-4 yellow
-5 yellow
-dtype: object
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">With DataFrame, reindex can alter either the (row) index, columns, or both. When passed only a sequence, it reindexes the rows in the result:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [98]: frame = pd.DataFrame(np.arange(9).reshape((3, 3)),
-....: index=['a', 'c', 'd'],
-....: columns=['Ohio', 'Texas', 'California'])
-In [99]: frame
-Out[99]:
-    Ohio Texas California
-a      0     1          2
-c      3     4          5
-d      6     7          8
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [100]: frame2 = frame.reindex(['a', 'b', 'c', 'd'])
-In [101]: frame2
-Out[101]:
-    Ohio Texas California
-a    0.0   1.0        2.0
-b    NaN   NaN        NaN
-c    3.0   4.0        5.0
-d    6.0   7.0        8.0
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">The columns can be reindexed with the columns keyword:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [102]: states = ['Texas', 'Utah', 'California']
-In [103]: frame.reindex(columns=states)
-Out[103]:
-    Texas Utah California
-a       1  NaN          2
-c       4  NaN          5
-d       7  NaN          8
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [104]: frame.loc[['a', 'b', 'c', 'd'], states]
-Out[104]:
-    Texas Utah California
-a     1.0  NaN        2.0
-b     NaN  NaN        NaN
-c     4.0  NaN        5.0
-d     7.0  NaN        8.0
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Dropping Entries from an Axis</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [105]: obj = pd.Series(np.arange(5.), index=['a', 'b', 'c', 'd', 'e'])
-In [106]: obj
-Out[106]:
-a 0.0
-b 1.0
-c 2.0
-d 3.0
-e 4.0
-dtype: float64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [107]: new_obj = obj.drop('c')
-In [108]: new_obj
-Out[108]:
-a 0.0
-b 1.0
-d 3.0
-e 4.0
-dtype: float64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [109]: obj.drop(['d', 'c'])
-Out[109]:
-a 0.0
-b 1.0
-e 4.0
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">
-                        With DataFrame, index values can be deleted from either axis. To illustrate this, we first create an example DataFrame:
-                    </p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [110]: data = pd.DataFrame(np.arange(16).reshape((4, 4)),
-.....: index=['Ohio', 'Colorado', 'Utah', 'New York'],
-.....: columns=['one', 'two', 'three', 'four'])
-In [111]: data
-Out[111]:
-            one two three four
-Ohio          0   1     2    3
-Colorado      4   5     6    7
-Utah          8   9    10   11
-New York     12  13    14   15
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [112]: data.drop(['Colorado', 'Ohio'])
-Out[112]:
-            one two three four
-Utah          8   9    10   11
-New York     12  13    14   15
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [113]: data.drop('two', axis=1)
-Out[113]:
-            one three four
-Ohio          0     2    3
-Colorado      4     6    7
-Utah          8    10   11
-New York     12    14   15
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
+ 
+string = 'Importance of relative word frequencies for font-size. 
+With relative_scaling=0, only word-ranks are considered. With 
+relative_scaling=1, a word that is twice as frequent will have 
+twice the size. If you want to consider the word frequencies 
+and not only their rank, relative_scaling around .5 often looks good.'
 
-In [114]: data.drop(['two', 'four'], axis='columns')
-Out[114]:
-            one three
-Ohio          0     2
-Colorado      4     6
-Utah          8    10
-New York     12    14
+font = r'C:\Windows\Fonts\Arial.TTF'
+wc = WordCloud(font_path=font, #如果是中文必须要添加这个，否则会显示成框框
+               background_color='white',
+               width=1000,
+               height=800,
+               ).generate(string)
+wc.to_file('s1.png') #保存图片
+plt.imshow(wc)  #用plt显示图片
+plt.axis('off') #不显示坐标轴
+plt.show() #显示图片
 </code></pre>
                     </div>
+                </section>
+                <section>
+                    <ul>
+                        <li>Loading text file</li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
+ 
+filename = 'Harry Potter.txt'
+with open(filename , encoding="utf-8") as f_obj:
+    contents = f_obj.read()
+
+font = r'C:\Windows\Fonts\Arial.TTF'
+wc = WordCloud(font_path=font, 
+               background_color='white',
+               width=1000,
+               height=800,
+               ).generate(contents)
+wc.to_file('s2.png') 
+plt.imshow(wc)  
+plt.axis('off') 
+plt.show() 
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <ul>
+                        <li>Loading Chinese text file</li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
+
+filename = 'sanguo.txt'
+with open(filename , encoding="utf-8") as f_obj:
+    contents = f_obj.read()
+
+
+font = r'C:\Windows\Fonts\simkai.ttf'
+
+wc = WordCloud(font_path=font, 
+               background_color='white',
+               width=1000,
+               height=800,
+               ).generate(contents)
+wc.to_file('s3.png') 
+plt.imshow(wc)  
+plt.axis('off') 
+plt.show() 
+</code></pre>
+                </div>
+                </section>
+                <section>
+                 <ul>
+                    <li>Using jieba</li>
+                </ul>
+                <div class="fragment">
+                    <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
+import jieba
+filename = 'sanguo.txt'
+with open(filename , encoding="utf-8") as f_obj:
+    contents = f_obj.read()
+
+s = jieba.lcut(contents) 
+txt = " ".join(s)
+print(txt)
+font = r'C:\Windows\Fonts\simkai.ttf'
+wc = WordCloud(font_path=font, 
+               background_color='white',
+               width=1000,
+               height=800,
+               ).generate(txt)
+wc.to_file('s4.png') 
+plt.imshow(wc)  
+plt.axis('off') 
+plt.show() 
+</code></pre>
+                </div>
+                </section>
+                <section>
+                    <h3>Character encoding Encoding</h3>
+                    <ul>
+                        <li>ASCII</li>
+                        <li>Unicode</li>
+                        <li>UTF-8</li>
+                    </ul>
+                </section>
+                <section>
+                    <ul>
+                        <li>
+                            <p>Python Crash Couse (Chapters we do not cover: Chapter 12 - 14, 18 - 20)</p>
+                            <ul>
+                                <li>
+                                    <p>Chapter 12 -14: Alien Invasion</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 18 - 20: Django</p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <p>Python for Everybody (Chapters we do not cover: Chapter 11 - 13, 15 - 16)</p>
+                            <ul>
+                                <li>
+                                    <p>Chapter 11: Regualer Expressions</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 12: Networked Programs 12.4 - 12.8 (urlib, BeautifulSoup)</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 13: Using Web Services (XML, JSON, API)</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 15: Databases and SQL</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 16: Visualizing data (Network, Word Cloud)</p>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+            <section>
+                <section data-background="#2980b9" style="color: white">
+                    <h2 style="color: white">13.2 Algorithm Intro</h2>
+                </section>
+                <section>
+                   <div id="leftc"><img data-src="a1.png" style="height: 350pt"></div>
+                    <div id="rightc"><img data-src="a2.jpg" style="height: 350pt"></div>
+                </section>
+                <section>
+                    <ul>
+                        <li>Complexity, Big-O (Searching)</li>
+                        <li>Recursion, D&C</li>
+                        <li>Sorting Algorithms</li>
+                        <li>0/1 Knapsack Problem</li>
+                        <ul>
+                            <li>Greedy Algorithm</li>
+                            <li>Dynamic Programming</li>
+                        </ul>
+                    </ul>
+                </section>
+                <section>
                     <ul>
                         <li class="fragment">
-                            <p>Many functions, like drop, which modify the size or shape of a Series or DataFrame, can manipulate an object in-place without returning a new object.
+                            <p>Another stream of the basic knowledge about programming is <b>algorithm and data structure.</b></p>
+                        </li>
+                        <li class="fragment">
+                            <p>An algorithm is a set of instructions for accomplishing a task.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>Every piece of code could be called an algorithm.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>To learn this, you only need to know some basic algebra and Discrete mathematics.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>Let's start with a simple algorithm.</p>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <h6>Binary Search</h6>
+                    <ul>
+                        <li class="fragment">
+                            <p>Binary search is an algorithm; its input is a sorted list of elements. If an element you’re looking for is in that list, binary search returns the position where it’s located. Otherwise, binary search returns null.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>Here's an example of how binary search works. I'm thinking of a number between 1 and 100.</p>
+                        </li>
+                    </ul>
+                    <div class="fragment"><img data-src="0.png" style="height: 100pt"></div>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>You have to try to guess my number in the fewest tries possible. With every guess, I'll tell you if your guess is too low, too high, or correct.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>Suppose you start guessing like this: 1, 2, 3, 4 ...</p>
+                        </li>
+                        <li class="fragment">
+                            <p>If you perform a simple search, and my number was 99, it could take you 99 guesses to get there!</p>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>Here’s a better technique. Start with 50.</p>
+                        </li>
+                    </ul>
+                    <div class="fragment"><img data-src="1.png" style="height: 200pt"></div>
+                    <div class="fragment"><img data-src="2.png" style="height: 200pt"></div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="3.png" style="height: 200pt"></div>
+                    <div class="fragment"><img data-src="4.png" style="height: 100pt"></div>
+                    <ul>
+                        <li class="fragment">
+                            <p>In general, for any list of $n$, binary search will take $log_2n$ steps to run in the worst case, whereas simple search will take $n$ steps.
                             </p>
                         </li>
                     </ul>
                 </section>
                 <section>
-                    <h6>Indexing, Selection, and Filtering</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [117]: obj = pd.Series(np.arange(4.), index=['a', 'b', 'c', 'd'])
-In [118]: obj
-Out[118]:
-a 0.0
-b 1.0
-c 2.0
-d 3.0
-dtype: float64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [119]: obj['b']
-Out[119]: 1.0
-In [120]: obj[1]
-Out[120]: 1.0
-In [121]: obj[2:4]
-Out[121]:
-c 2.0
-d 3.0
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [122]: obj[['b', 'a', 'd']]
-Out[122]:
-b 1.0
-a 0.0
-d 3.0
-dtype: float64
-
-In [123]: obj[[1, 3]]
-Out[123]:
-b 1.0
-d 3.0
-dtype: float64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [124]: obj[obj < 2]
-Out[124]:
-a 0.0
-b 1.0
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">Slicing with labels behaves differently than normal Python slicing in that the endpoint is inclusive:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [125]: obj['b':'c']
-Out[125]:
-b 1.0
-c 2.0
-dtype: float64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [126]: obj['b':'c'] = 5
-In [127]: obj
-Out[127]:
-a 0.0
-b 5.0
-c 5.0
-d 3.0
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">Indexing into a DataFrame is for retrieving one or more columns either with a single value or sequence:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [128]: data = pd.DataFrame(np.arange(16).reshape((4, 4)),
-.....:  index=['Ohio', 'Colorado', 'Utah', 'New York'],
-.....:  columns=['one', 'two', 'three', 'four'])
-
-In [129]: data
-Out[129]:
-          one  two  three  four
-Ohio        0    1      2     3
-Colorado    4    5      6     7
-Utah        8    9     10    11
-New York   12   13     14    15
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [130]: data['two']
-Out[130]:
-Ohio         1
-Colorado     5
-Utah         9
-New York    13
-Name: two, dtype: int32
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [131]: data[['three', 'one']]
-Out[131]:
-          three  one
-Ohio          2    0
-Colorado      6    4
-Utah         10    8
-New York     14   12
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [132]: data[:2]
-Out[132]:
-          one  two  three  four
-Ohio        0    1      2     3
-Colorado    4    5      6     7
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [133]: data[data['three'] > 5]
-Out[133]:
-          one  two  three  four
-Colorado    4    5      6     7
-Utah        8    9     10    11
-New York   12   13     14    15
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">Another use case is in indexing with a boolean DataFrame, such as one produced by a scalar comparison:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [134]: data < 5
-Out[134]:
-            one    two  three   four
-Ohio       True   True   True   True
-Colorado   True  False  False  False
-Utah      False  False  False  False
-New York  False  False  False  False
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [135]: data[data < 5] = 0
-In [136]: data
-Out[136]:
-          one  two  three  four
-Ohio        0    0      0     0
-Colorado    0    5      6     7
-Utah        8    9     10    11
-New York   12   13     14    15
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Selection with loc and iloc</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [137]: data.loc['Colorado', ['two', 'three']]
-Out[137]:
-two      5
-three    6
-Name: Colorado, dtype: int32
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [138]: data.iloc[2, [3, 0, 1]]
-Out[138]:
-four    11
-one      8
-two      9
-Name: Utah, dtype: int32
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [139]: data.iloc[2]
-Out[139]:
-one       8
-two       9
-three    10
-four     11
-Name: Utah, dtype: int32
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [140]: data.iloc[[1, 2], [3, 0, 1]]
-Out[140]:
-          four  one  two
-Colorado     7    0    5
-Utah        11    8    9
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [141]: data.loc[:'Utah', 'two']
-Out[141]:
-Ohio        0
-Colorado    5
-Utah        9
-Name: two, dtype: int32
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [142]: data.iloc[:, :3][data.three > 5]
-Out[142]:
-          one  two  three
-Colorado    0    5      6
-Utah        8    9     10
-New York   12   13     14
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Integer Indexes</h6>
-                    <p class="fragment">Working with pandas objects indexed by integers is something that often trips up new users due to some differences with indexing semantics on built-in Python data structures like lists and tuples.</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-import pandas as pd
-import numpy as np
-ser = pd.Series(np.arange(3.))
-print(ser)
-
-0    0.0
-1    1.0
-2    2.0
-dtype: float64
-</code></pre>
-                    </div>
-                    <p class="fragment">It’s difficult to do this in general without introducing subtle bugs. Here we have an index containing 0, 1, 2, but inferring what the user wants (label-based indexing or position-based) is difficult.</p>
-                    <p class="fragment"><b>On the other hand, with a non-integer index, there is no potential for ambiguity.</b></p>
-                </section>
-                <section>
-                    <h3>Summary: Pandas (2)</h3>
                     <ul>
-                        <li class="fragement">
-                            <p>Pandas index objects are immutable, can contain duplicate labels</p>
+                        <li class="fragment">
+                            <p><b>Running time</b></p>
                         </li>
-                        <li class="fragement">
-                            <p>Reindex: obj.reindex, obj3.reindex(range(6), method='ffill'), frame.reindex(columns=states), obj.drop('c'), data.drop('two', axis=1)</p>
+                        <li class="fragment">
+                            <p>Any time I talk about an algorithm, I'll discuss its running time. Generally you want to choose the most efficient algorithm— whether you're trying to optimize for time or space.</p>
                         </li>
-                        <li class="fragement">
-                            <p>Indexing, Selection, and Filtering: for Series, they are similar to array, <b>Slicing with labels</b>; for DataFrame, [] selects columns, and .loc and .iloc selects rows.</p>
+                        <li class="fragment">
+                            <p>For simple search, the maximum number of guesses is the same as the size of the list. This is called <b>linear time</b>.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>Binary search runs in <b>logarithmic time</b>.</p>
                         </li>
                     </ul>
+                </section>
+                <section>
+                    <h6>Big O notation</h6>
+                    <ul>
+                        <li class="fragment">
+                            <p>Big O notation is special notation that tells you how fast an algorithm is.</p>
+                        </li>
+                    </ul>
+                    <div class="fragment"><img data-src="5.png" style="height: 120pt"></div>
+                    <ul>
+                        <li class="fragment">
+                            <p>You need to know how the running time increases as the list size increases. That’s where Big O notation comes in.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>Big O notation tells you how fast an algorithm is. For example, suppose you have a list of size n. Simple search needs to check each element, so it will take n operations. The run time in Big O notation is O(n).</p>
+                        </li>
+                        <li class="fragment">
+                            <p><b>Big O notation lets you compare the number of operations. It tells you how fast the algorithm grows. Run times grow at very different speeds</b></p>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>Binary search needs log n operations to check a list of size n. It's $O(log n)$.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>Sometimes the performance of an algorithm depends on the exact values of the data rather than simply the size of the problem. For these kinds of algorithms we need to characterize their performance in terms of best case, <b>average case</b> and <b>worst-case</b> performance.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>$O(log n)$, $O(n)$, $O(n * log n)$, $O(n^2)$, $O(2^n)$, $O(n!)$ (P and NP)</p>
+                        </li>
+                    </ul>
+                    <div class="fragment"><img data-src="6.png" style="height: 300pt"></div>
                 </section>
             </section>
             <section>
                 <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">13.2 Pandas (3)</h2>
+                    <h2 style="color: white">15.2 Recursion</h2>
                 </section>
                 <section>
-                    <h6>Arithmetic and Data Alignment</h6>
+                    <h6>Base case and recursive case</h6>
                     <div class="fragment">
                         <pre><code class="line-numbers" data-trim contenteditable>
-In [150]: s1 = pd.Series([7.3, -2.5, 3.4, 1.5], index=['a', 'c', 'd', 'e'])
-In [151]: s2 = pd.Series([-2.1, 3.6, -1.5, 4, 3.1], index=['a', 'c', 'e', 'f', 'g'])
+def fact(n):
+    if n==1:
+        return 1 #Base case
+    else:
+        return n * fact(n - 1) #recursive case
 </code></pre>
                     </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [154]: s1 + s2
-Out[154]:
-a 5.2
-c 1.1
-d NaN
-e 0.0
-f NaN
-g NaN
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [155]: df1 = pd.DataFrame(np.arange(9.).reshape((3, 3)), columns=list('bcd'),
-.....: index=['Ohio', 'Texas', 'Colorado'])
-In [156]: df2 = pd.DataFrame(np.arange(12.).reshape((4, 3)), columns=list('bde'),
-.....: index=['Utah', 'Ohio', 'Texas', 'Oregon'])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [157]: df1
-Out[157]:
-            b    c    d
-Ohio      0.0  1.0  2.0
-Texas     3.0  4.0  5.0
-Colorado  6.0  7.0  8.0
-In [158]: df2
-Out[158]:
-          b     d     e
-Utah    0.0   1.0   2.0
-Ohio    3.0   4.0   5.0
-Texas   6.0   7.0   8.0
-Oregon  9.0  10.0  11.0
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [159]: df1 + df2
-Out[159]:
-            b   c     d   e
-Colorado  NaN NaN   NaN NaN
-Ohio      3.0 NaN   6.0 NaN
-Oregon    NaN NaN   NaN NaN
-Texas     9.0 NaN  12.0 NaN
-Utah      NaN NaN   NaN NaN
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">If you add DataFrame objects with no column or row labels in common, the result will contain all nulls:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [160]: df1 = pd.DataFrame({'A': [1, 2]})
-In [161]: df2 = pd.DataFrame({'B': [3, 4]})
-In [162]: df1
-Out[162]:
-  A
-0 1
-1 2
-In [163]: df2
-Out[163]:
-  B
-0 3
-1 4
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [164]: df1 - df2
-Out[164]:
-    A   B
-0 NaN NaN
-1 NaN NaN
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Arithmetic methods with fill values</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [165]: df1 = pd.DataFrame(np.arange(12.).reshape((3, 4)),
-.....:                      columns=list('abcd'))
-In [166]: df2 = pd.DataFrame(np.arange(20.).reshape((4, 5)),
-.....:                      columns=list('abcde'))
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [167]: df2.loc[1, 'b'] = np.nan
-In [168]: df1
-Out[168]:
-     a    b     c     d
-0  0.0  1.0   2.0   3.0
-1  4.0  5.0   6.0   7.0
-2  8.0  9.0  10.0  11.0
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [169]: df2
-Out[169]:
-      a     b     c     d     e
-0   0.0   1.0   2.0   3.0   4.0
-1   5.0   NaN   7.0   8.0   9.0
-2  10.0  11.0  12.0  13.0  14.0
-3  15.0  16.0  17.0  18.0  19.0
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [170]: df1 + df2
-Out[170]:
-      a     b     c     d   e
-0   0.0   2.0   4.0   6.0 NaN
-1   9.0   NaN  13.0  15.0 NaN
-2  18.0  20.0  22.0  24.0 NaN
-3   NaN   NaN   NaN   NaN NaN
-</code></pre>
-                    </div>
-                    <p class="fragment">Using the add method on df1, I pass df2 and an argument to fill_value:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [171]: df1.add(df2, fill_value=0)
-Out[171]:
-      a     b     c     d     e
-0   0.0   2.0   4.0   6.0   4.0
-1   9.0   5.0  13.0  15.0   9.0
-2  18.0  20.0  22.0  24.0  14.0
-3  15.0  16.0  17.0  18.0  19.0
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [172]: 1 / df1
-Out[172]:
-          a         b         c         d
-0       inf  1.000000  0.500000  0.333333
-1  0.250000  0.200000  0.166667  0.142857
-2  0.125000  0.111111  0.100000  0.090909
-
-In [173]: df1.rdiv(1)
-Out[173]:
-          a         b         c         d
-0       inf  1.000000  0.500000  0.333333
-1  0.250000  0.200000  0.166667  0.142857
-2  0.125000  0.111111  0.100000  0.090909
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [174]: df1.reindex(columns=df2.columns, fill_value=0)
-Out[174]:
-     a    b     c     d  e
-0  0.0  1.0   2.0   3.0  0
-1  4.0  5.0   6.0   7.0  0
-2  8.0  9.0  10.0  11.0  0
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment"><img data-src="2.png" style="height: 400pt"></div>
-                </section>
-                <section>
-                    <p class="fragment">Operations between DataFrame and Series</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [175]: arr = np.arange(12.).reshape((3, 4))
-In [176]: arr
-Out[176]:
-array([[  0.,   1.,   2.,   3.],
-       [  4.,   5.,   6.,   7.],
-       [  8.,   9.,  10.,  11.]])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [177]: arr[0]
-Out[177]: array([ 0., 1., 2., 3.])
-In [178]: arr - arr[0]
-Out[178]:
-array([[ 0.,  0.,  0.,  0.],
-       [ 4.,  4.,  4.,  4.],
-       [ 8.,  8.,  8.,  8.]])
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragement">Operations between a DataFrame and a Series are similar:
-                    </p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [179]: frame = pd.DataFrame(np.arange(12.).reshape((4, 3)),
-.....: columns=list('bde'),
-.....: index=['Utah', 'Ohio', 'Texas', 'Oregon'])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [180]: series = frame.iloc[0]
-In [181]: frame
-Out[181]:
-          b     d     e
-Utah    0.0   1.0   2.0
-Ohio    3.0   4.0   5.0
-Texas   6.0   7.0   8.0
-Oregon  9.0  10.0  11.0
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [182]: series
-Out[182]:
-b 0.0
-d 1.0
-e 2.0
-Name: Utah, dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">By default, arithmetic between DataFrame and Series matches the index of the Series on the DataFrame’s columns, broadcasting down the rows:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [183]: frame - series
-Out[183]:
-          b    d    e
-Utah    0.0  0.0  0.0
-Ohio    3.0  3.0  3.0
-Texas   6.0  6.0  6.0
-Oregon  9.0  9.0  9.0
-</code></pre>
-                    </div>
-                    <p class="fragment">If an index value is not found in either the DataFrame’s columns or the Series’s index, the objects will be reindexed to form the union:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [184]: series2 = pd.Series(range(3), index=['b', 'e', 'f'])
-In [185]: frame + series2
-Out[185]:
-          b   d     e   f
-Utah    0.0 NaN   3.0 NaN
-Ohio    3.0 NaN   6.0 NaN
-Texas   6.0 NaN   9.0 NaN
-Oregon  9.0 NaN  12.0 NaN
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">If you want to instead broadcast over the columns, matching on the rows, you have to use one of the arithmetic methods. For example:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [186]: series3 = frame['d']
-In [187]: frame
-Out[187]:
-          b     d     e
-Utah    0.0   1.0   2.0
-Ohio    3.0   4.0   5.0
-Texas   6.0   7.0   8.0
-Oregon  9.0  10.0  11.0
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [188]: series3
-Out[188]:
-Utah       1.0
-Ohio       4.0
-Texas      7.0
-Oregon    10.0
-Name: d, dtype: float64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [189]: frame.sub(series3, axis='index') #(axis='index' or axis=0)
-Out[189]: 
-          b    d    e
-Utah   -1.0  0.0  1.0
-Ohio   -1.0  0.0  1.0
-Texas  -1.0  0.0  1.0
-Oregon -1.0  0.0  1.0
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Function Application and Mapping</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [190]: frame = pd.DataFrame(np.random.randn(4, 3), columns=list('bde'),
-.....: index=['Utah', 'Ohio', 'Texas', 'Oregon'])
-
-In [191]: frame
-Out[191]:
-               b         d         e
-Utah    0.228056 -0.765553 -1.089593
-Ohio   -0.119008 -1.774919  1.194265
-Texas   0.016056 -0.341004  0.588025
-Oregon -0.044519 -0.129478 -0.148802
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [192]: np.abs(frame)
-Out[192]:
-               b         d         e
-Utah    0.228056  0.765553  1.089593
-Ohio    0.119008  1.774919  1.194265
-Texas   0.016056  0.341004  0.588025
-Oregon  0.044519  0.129478  0.148802
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">Another frequent operation is applying a function on one-dimensional arrays to each column or row. DataFrame’s <b>apply</b> method does exactly this:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [193]: f = lambda x: x.max() - x.min()
-In [194]: frame.apply(f)
-Out[194]:
-b    3.183504
-d    2.418438
-e    2.365567
-dtype: float64
-</code></pre>
-                    </div>
-                    <p class="fragment">If you pass axis='columns' to apply, the function will be invoked once per row instead:
-                    </p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [195]: frame.apply(f, axis='columns')
-Out[195]:
-Utah      0.759014
-Ohio      1.994896
-Texas     1.748465
-Oregon    2.390954
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">The function passed to apply need not return a scalar value; it can also return a Series with multiple values:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [196]: def f(x):
-.....: return pd.Series([x.min(), x.max()], index=['min', 'max'])
-In [197]: frame.apply(f)
-Out[197]:
-            b         d         e
-min -1.076530 -0.442564 -1.674224
-max  0.871809  1.596725  0.955903
-</code></pre>
-                    </div>
-                    <p class="fragment">Element-wise Python functions can be used, too. Suppose you wanted to compute a formatted string from each floating-point value in frame. You can do this with <b>apply map</b>:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [198]: format = lambda x: '%.2f' % x
-In [199]: frame.applymap(format)
-Out[199]:
-            b      d      e
-Utah    -0.16  -1.40  -1.33
-Ohio    -0.71   0.85   0.31
-Texas   -0.54   0.46  -1.07
-Oregon   0.12   1.52  -1.14
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Sorting and Ranking</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [201]: obj = pd.Series(range(4), index=['d', 'a', 'b', 'c'])
-In [202]: obj.sort_index() #sort_index method
-Out[202]:
-a 1
-b 2
-c 3
-d 0
-dtype: int64
-</code></pre>
-                    </div>
-                    <p class="fragment">With a DataFrame, you can sort by index on either axis:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [203]: frame = pd.DataFrame(np.arange(8).reshape((2, 4)),
-.....: index=['three', 'one'],
-.....: columns=['d', 'a', 'b', 'c'])
-In [204]: frame.sort_index()
-
-Out[204]:
-       d  a  b  c
-one    4  5  6  7
-three  0  1  2  3
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [205]: frame.sort_index(axis=1)
-Out[205]:
-       a  b  c  d
-three  1  2  3  0
-one    5  6  7  4
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">
-                        The data is sorted in ascending order by default, but can be sorted in descending order, too:
-                    </p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [206]: frame.sort_index(axis=1, ascending=False)
-Out[206]:
-       d  c  b  a
-three  0  3  2  1
-one    4  7  6  5
-</code></pre>
-                    </div>
-                    <p class="fragment">To sort a Series by its values, use its sort_values method:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [207]: obj = pd.Series([4, 7, -3, 2])
-In [208]: obj.sort_values()
-Out[208]:
-2 -3
-3 2
-0 4
-1 7
-dtype: int64
-</code></pre>
-                    </div>
-                    <p class="fragment">Any missing values are sorted to the end of the Series by default.</p>
-                </section>
-                <section>
-                    <p class="fragment">When sorting a DataFrame, you can use the data in one or more columns as the sort keys. To do so, pass one or more column names to the by option of sort_values:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [211]: frame = pd.DataFrame({'b': [4, 7, -3, 2], 'a': [0, 1, 0, 1]})
-In [212]: frame
-Out[212]:
-   b  a
-0  4  0
-1  7  1
-2 -3  0
-3  2  1
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [213]: frame.sort_values(by='b')
-Out[213]:
-   b  a
-2 -3  0
-3  2  1
-0  4  0
-1  7  1
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [214]: frame.sort_values(by=['a', 'b'])
-Out[214]:
-   b  a
-2 -3  0
-0  4  0
-3  2  1
-1  7  1
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">Rank</p>
-                    <p class="fragment">By default rank breaks ties by assigning each group the mean rank:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [215]: obj = pd.Series([7, -5, 7, 4, 2, 0, 4])
-In [216]: obj.rank()
-Out[216]:
-0 6.5
-1 1.0
-2 6.5
-3 4.5
-4 3.0
-5 2.0
-6 4.5
-dtype: float64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [217]: obj.rank(method='first')
-Out[217]:
-0 6.0
-1 1.0
-2 7.0
-3 4.0
-4 3.0
-5 2.0
-6 5.0
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">DataFrame can compute ranks over the rows or the columns:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [219]: frame = pd.DataFrame({'b': [4.3, 7, -3, 2], 'a': [0, 1, 0, 1],
-.....: 'c': [-2, 5, 8, -2.5]})
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [220]: frame
-Out[220]:
-     b  a    c
-0  4.3  0 -2.0
-1  7.0  1  5.0
-2 -3.0  0  8.0
-3  2.0  1 -2.5
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [221]: frame.rank(axis='columns')
-Out[221]:
-     b    a    c
-0  3.0  2.0  1.0
-1  3.0  1.0  2.0
-2  1.0  2.0  3.0
-3  3.0  2.0  1.0
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h3>Summary: Pandas (3)</h3>
                     <ul>
-                        <li class="fragement">
-                            <p>Arithmetic and Data Alignment</p>
+                        <li class="fragment">
+                            <p>The recursive case is when the function calls itself. The base case is when the function does not call itself again... so it doesn't go into an infinite loop.</p>
                         </li>
-                        <li class="fragement">
-                            <p>Arithmetic methods with fill values</p>
+                    </ul>
+                </section>
+                <section>
+                    <h6>The stack</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+def greet(name):
+    print('hello '+ name + '!')
+    greet2(name)
+    print('getting ready to say bye...')
+    bye()
+
+def greet2(name):
+    print('how are you, ' + name + '?')
+def bye():
+    print('Ok, bye!')
+</code></pre>
+                    </div>
+                    <div class="fragment"><img data-src="s1.png" style="height: 150pt"></div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="s2.png" style="height: 150pt"></div>
+                    <div class="fragment"><img data-src="s3.png" style="height: 150pt"></div>
+                    <div class="fragment"><img data-src="s4.png" style="height: 150pt"></div>
+                </section>
+                <section>
+                    <h6>The call stack with recursion</h6>
+                    <div class="fragment"><img data-src="s5.png" style="height: 400pt"></div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="s6.png" style="height: 400pt"></div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="s7.png" style="height: 300pt"></div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="s8.png" style="height: 300pt"></div>
+                </section>
+                <section>
+                    <h6>Divide and Conquer (D&C, 分而治之)</h6>
+                    <ul>
+                        <li class="fragment">
+                            <p>D&C gives you a new way to think about solving problems. When you get a new problem, you don't have to be stumped. Instead, you can ask, "Can I solve this if I use divide and conquer?"</p>
                         </li>
-                        <li class="fragement">
-                            <p>Function Application and Mapping: .apply, .applymap</p>
+                        <li class="fragment">
+                            <p>You want to divide this farm evenly into square plots. You want the plots to be as big as possible.</p>
                         </li>
-                        <li class="fragement">
-                            <p>Sorting and Ranking: .sort_index, .sort_values(), .rank()</p>
+                    </ul>
+                    <div class="fragment"><img data-src="7.png" style="height: 150pt"></div>
+                    <div class="fragment"><img data-src="8.png" style="height: 150pt"></div>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>To solve a problem using D&C, there are two steps:</p>
+                        </li>
+                        <li class="fragment">
+                            <p>1. Figure out the base case. This should be the simplest possible case.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>2. Divide or decrease your problem until it becomes the base case.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>What is the largest square size you can use? You have to reduce your problem. Let’s start by marking out the biggest boxes you can use.</p>
+                        </li>
+                    </ul>
+                    <div class="fragment"><img data-src="9.png" style="height: 200pt"></div>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>There’s a farm segment left to divide. <b>Why don’t you apply the same algorithm to this segment?</b></p>
+                        </li>
+                    </ul>
+                    <div class="fragment"><img data-src="10.png" style="height: 200pt"></div>
+                    <ul>
+                        <li class="fragment">
+                            <p>If you find the biggest box that will work for this size, that will be the biggest box that will work for the entire farm. You just reduced the problem from a 1680 × 640 farm to a 640 × 400 farm!</p>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="11.png" style="height: 150pt"></div>
+                    <div class="fragment"><img data-src="12.png" style="height: 150pt"></div>
+                    <div class="fragment"><img data-src="13.png" style="height: 150pt"></div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="14.png" style="height: 150pt"></div>
+                    <ul>
+                        <li class="fragment">
+                            <p>To recap, here's how D&C works: </p>
+                        </li>
+                        <li class="fragment">
+                            <p>1. Figure out a simple case as the base case. </p>
+                        </li>
+                        <li class="fragment">
+                            <p>2. Figure out how to reduce your problem and get to the base case. </p>
+                        </li>
+                        <li class="fragment">
+                            <p><b>D&C isn't a simple algorithm that you can apply to a problem. Instead, it's a way to think about a problem.</b></p>
                         </li>
                     </ul>
                 </section>
             </section>
+            
             <section>
-                <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">13.3 Pandas (4)</h2>
-                </section>
-                <section>
-                    <h6>Axis Indexes with Duplicate Labels</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [222]: obj = pd.Series(range(5), index=['a', 'a', 'b', 'b', 'c'])
-In [223]: obj
-Out[223]:
-a 0
-a 1
-b 2
-b 3
-c 4
-dtype: int64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [224]: obj.index.is_unique
-Out[224]: False
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [225]: obj['a']
-Out[225]:
-a 0
-a 1
-dtype: int64
-In [226]: obj['c']
-Out[226]: 4
-</code></pre>
-                    </div>
-                    <p class="fragment">The same logic extends to indexing rows in a DataFrame:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [227]: df = pd.DataFrame(np.random.randn(4, 3), index=['a', 'a', 'b', 'b'])
-In [228]: df
-Out[228]:
-          0         1         2
-a  1.723272  1.234279 -1.757140
-a -0.598935  0.446516  0.091765
-b  0.116673 -1.196865  1.932512
-b  1.742686 -3.270608  0.957614
-
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [229]: df.loc['b']
-Out[229]:
-          0         1         2
-b -0.564811 -0.303422 -0.104751
-b  1.060441 -0.493269 -0.242181
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Summarizing and Computing Descriptive Statistics</h6>
-                    <p class="fragment">Compared with the similar methods found on NumPy arrays, Pandas has built-in handling for missing data.</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [230]: df = pd.DataFrame([[1.4, np.nan], [7.1, -4.5],
-.....: [np.nan, np.nan], [0.75, -1.3]],
-.....: index=['a', 'b', 'c', 'd'],
-.....: columns=['one', 'two'])
-In [231]: df
-Out[231]:
-    one  two
-a  1.40  NaN
-b  7.10 -4.5
-c   NaN  NaN
-d  0.75 -1.3
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [232]: df.sum()
-Out[232]:
-one     9.25
-two    -5.80
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [233]: df.sum(axis='columns')
-Out[233]:
-a  1.40
-b  2.60
-c   NaN
-d -0.55
-dtype: float64
-</code></pre>
-                    </div>
-                    <p class="fragment">NA values are excluded unless the entire slice (row or column in this case) is NA. This can be disabled with the skipna option:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [234]: df.mean(axis='columns', skipna=False)
-Out[234]:
-a    NaN
-b  1.300
-c    NaN
-d -0.275
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [235]: df.idxmax()
-Out[235]:
-one b
-two d
-dtype: object
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [236]: df.cumsum()
-Out[236]:
-    one     two
-a  1.40     NaN
-b  8.50    -4.5
-c   NaN     NaN
-d  9.25    -5.8
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [237]: df.describe()
-Out[237]:
-            one       two
-count  3.000000  2.000000
-mean   3.083333 -2.900000
-std    3.493685  2.262742
-min    0.750000 -4.500000
-25%    1.075000 -3.700000
-50%    1.400000 -2.900000
-75%    4.250000 -2.100000
-max    7.100000 -1.300000
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [238]: obj = pd.Series(['a', 'a', 'b', 'c'] * 4)
-In [239]: obj.describe()
-Out[239]:
-count     16
-unique     3
-top        a
-freq       8
-dtype: object
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment"><img data-src="3.png" style="height: 400pt"></div>
-                </section>
-                <section>
-                    <h6>Unique Values, Value Counts, and Membership</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [251]: obj = pd.Series(['c', 'a', 'd', 'a', 'a', 'b', 'b', 'c', 'c'])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [252]: uniques = obj.unique()
-In [253]: uniques
-Out[253]: array(['c', 'a', 'd', 'b'], dtype=object)
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [254]: obj.value_counts()
-Out[254]:
-c 3
-a 3
-b 2
-d 1
-dtype: int64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragement">Sorted by value
-                    </p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [255]: pd.value_counts(obj.values, sort=False)
-Out[255]:
-a 3
-b 2
-c 3
-d 1
-dtype: int64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [257]: mask = obj.isin(['b', 'c'])
-In [258]: mask
-Out[258]:
-0 True
-1 False
-2 False
-3 False
-4 False
-5 True
-6 True
-7 True
-8 True
-dtype: bool
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [259]: obj[mask]
-Out[259]:
-0 c
-5 b
-6 b
-7 c
-8 c
-dtype: object
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Data Loading, Storage with Pandas</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [9]: df = pd.read_csv('examples/ex1.csv')
-In [10]: df
-Out[10]:
-   a   b   c   d message
-0  1   2   3   4   hello
-1  5   6   7   8   world
-2  9  10  11  12     foo
-</code></pre>
-                    </div>
-                    <p class="fragment">A file without header row</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [13]: pd.read_csv('examples/ex2.csv', header=None) 
-#header=None, otherwise it identifies the first data row as the header row.
-Out[13]:
-   0   1   2   3       4
-0  1   2   3   4   hello
-1  5   6   7   8   world
-2  9  10  11  12     foo
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [14]: pd.read_csv('examples/ex2.csv', names=['a', 'b', 'c', 'd', 'message'])
-Out[14]:
-   a   b   c   d message
-0  1   2   3   4   hello
-1  5   6   7   8   world
-2  9  10  11  12     foo
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">Suppose you wanted the message column to be the index of the returned DataFrame.</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [15]: names = ['a', 'b', 'c', 'd', 'message']
-In [16]: pd.read_csv('examples/ex2.csv', names=names, index_col='message')
-Out[16]:
-         a   b   c   d
-message               
-hello    1   2   3   4
-world    5   6   7   8
-foo      9  10  11  12
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-key1,key2,value1,value2
-one,a,1,2
-one,b,3,4
-one,c,5,6
-one,d,7,8
-two,a,9,10
-two,b,11,12
-two,c,13,14
-two,d,15,16
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [18]: parsed = pd.read_csv('examples/csv_mindex.csv',
-....: index_col=['key1', 'key2'])
-In [19]: parsed
-Out[19]:
-           value1  value2
-key1 key2                
-one  a          1       2
-     b          3       4
-     c          5       6
-     d          7       8
-two  a          9      10
-     b         11      12
-     c         13      14
-     d         15      16
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [20]: list(open('examples/ex3.txt'))
-Out[20]:
-['           A         B         C\n',
-'aaa -0.264438 -1.026059 -0.619500\n',
-'bbb  0.927272  0.302904 -0.032399\n',
-'ccc -0.264273 -0.386314 -0.217601\n',
-'ddd -0.871858 -0.348382  1.100491\n']
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [21]: result = pd.read_table('examples/ex3.txt', sep='\s+')
-In [22]: result
-Out[22]:
-            A         B         C
-aaa -0.264438 -1.026059 -0.619500
-bbb  0.927272  0.302904 -0.032399
-ccc -0.264273 -0.386314 -0.217601
-ddd -0.871858 -0.348382  1.100491
-</code></pre>
-                    </div>
-                    <p class="fragment">Because there was one fewer column name than the number of data rows, read_table infers that the first column should be the DataFrame’s index in this special case.
-                    </p>
-                </section>
-                <section>
-                    <p class="fragment">By default, pandas uses a set of commonly occurring sentinels, such as NA and NULL:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-something,a,b,c,d,message
-one,1,2,3,4,NA
-two,5,6,,8,world
-three,9,10,11,12,foo
-
-In [26]: result = pd.read_csv('examples/ex5.csv')
-In [27]: result
-Out[27]:
-  something  a   b     c   d message
-0       one  1   2   3.0   4     NaN 
-1       two  5   6   NaN   8   world
-2     three  9  10  11.0  12     foo
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [28]: pd.isnull(result)
-Out[28]:
-   something      a      b      c      d  message
-0      False  False  False  False  False     True
-1      False  False  False   True  False    False
-2      False  False  False  False  False    False
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [31]: sentinels = {'message': ['foo', 'NA'], 'something': ['two']}
-In [32]: pd.read_csv('examples/ex5.csv', na_values=sentinels)
-Out[32]:
-  something  a   b     c   d message
-0       one  1   2   3.0   4     NaN
-1       NaN  5   6   NaN   8   world
-2     three  9  10  11.0  12     NaN
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Reading Text Files in Pieces</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [33]: pd.options.display.max_rows = 10
-In [34]: result = pd.read_csv('examples/ex6.csv')
-In [35]: result
-Out[35]:
-           one       two     three      four key
-0     0.467976 -0.038649 -0.295344 -1.824726   L
-1    -0.358893  1.404453  0.704965 -0.200638   B
-2    -0.501840  0.659254 -0.421691 -0.057688   G
-3     0.204886  1.074134  1.388361 -0.982404   R
-4     0.354628 -0.133116  0.283763 -0.837063   Q
-...        ...       ...       ...       ...  ..
-9995  2.311896 -0.417070 -1.409599 -0.515821   L
-9996 -0.479893 -0.650419  0.745152 -0.646038   E
-9997  0.523331  0.787112  0.486066  1.093156   K
-9998 -0.362559  0.598894 -1.843201  0.887292   G
-9999 -0.096376 -1.012999 -0.657431 -0.573315   0
-
-[10000 rows x 5 columns]
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [36]: pd.read_csv('examples/ex6.csv', nrows=5)
-Out[36]:
-        one       two     three      four key
-0  0.467976 -0.038649 -0.295344 -1.824726   L
-1 -0.358893  1.404453  0.704965 -0.200638   B
-2 -0.501840  0.659254 -0.421691 -0.057688   G
-3  0.204886  1.074134  1.388361 -0.982404   R
-4  0.354628 -0.133116  0.283763 -0.837063   Q
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [37]: chunker = pd.read_csv('examples/ex6.csv', chunksize=1000)
-In [38]: chunker
-Out[38]: &lt;pandas.io.parsers.TextFileReader at 0x7f6b1e2672e8&gt;
-
-chunker = pd.read_csv('examples/ex6.csv', chunksize=1000)
-tot = pd.Series([])
-for piece in chunker:
-    tot = tot.add(piece['key'].value_counts(), fill_value=0)
-
-tot = tot.sort_values(ascending=False)
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Writing Data to Text Format</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [41]: data = pd.read_csv('examples/ex5.csv')
-In [42]: data
-Out[42]:
-  something  a   b     c   d message
-0       one  1   2   3.0   4     NaN
-1       two  5   6   NaN   8   world
-2     three  9  10  11.0  12     foo
-
-In [43]: data.to_csv('examples/out.csv')
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [47]: data.to_csv('examples/out.csv', na_rep='NULL', index=False) #header=False
-In [41]: data_1 = pd.read_csv('examples/out.csv')
-In [42]: data_1
-  something  a   b     c   d message
-0       one  1   2   3.0   4     NaN
-1       two  5   6   NaN   8   world
-2     three  9  10  11.0  12     foo
-
-In [49]: data.to_csv('examples/out.csv', index=False, columns=['a', 'b', 'c'])
-</code></pre>
-                    </div>
-                    <p class="fragment">Series also has a to_csv method.</p>
-                </section>
-                <section>
-                    <h6>JSON Data</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-obj = """{"name": "Wes",
-"places_lived": ["United States", "Spain", "Germany"],
-"pet": null,
-"siblings": [{"name": "Scott", "age": 30, "pets": ["Zeus", "Zuko"]},
-             {"name": "Katie", "age": 38, "pets": ["Sixes", "Stache", "Cisco"]}]
-}"""
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [62]: import json
-In [63]: result = json.loads(obj)
-In [64]: result
-Out[64]:
-{'name': 'Wes',
-'pet': None,
-'places_lived': ['United States', 'Spain', 'Germany'],
-'siblings': [{'age': 30, 'name': 'Scott', 'pets': ['Zeus', 'Zuko']},
-{'age': 38, 'name': 'Katie', 'pets': ['Sixes', 'Stache', 'Cisco']}]}
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [66]: siblings = pd.DataFrame(result['siblings'], columns=['name', 'age'])
-
-In [69]: data = pd.read_json('examples/example.json') 
-#pandas.read_json assume that each object in the JSON array is a row in the table.
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Reading Microsoft Excel Files</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-pip install xlrd
-pip install openpyxl
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [104]: xlsx = pd.ExcelFile('examples/ex1.xlsx')
-In [105]: pd.read_excel(xlsx, 'Sheet1')
-Out[105]:
-   a   b   c   d message
-0  1   2   3   4   hello
-1  5   6   7   8   world
-2  9  10  11  12     foo
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [108]: writer = pd.ExcelWriter('examples/ex2.xlsx')
-In [109]: frame.to_excel(writer, 'Sheet1')
-In [110]: writer.save()
-
-In [111]: frame.to_excel('examples/ex2.xlsx')
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h3>Summary: Pandas (4)</h3>
-                    <ul>
-                        <li class="fragement">
-                            <p>Axis Indexes with Duplicate Labels</p>
-                        </li>
-                        <li class="fragement">
-                            <p>Descriptive Statistics: .sum(), .sum(axis='columns'), .mean(axis='columns'), .idxmax(), .cumsum(), .describe()</p>
-                        </li>
-                        <li class="fragement">
-                            <p>.unique(), .value_counts()</p>
-                        </li>
-                        <li class="fragement">
-                            <p>Data Loading, Storage:</p>
-                            <p>pd.read_csv('examples/ex1.csv')</p>
-                            <p>pd.read_table('examples/ex3.txt', sep='\s+')</p>
-                            <p>data.to_csv('examples/out.csv', index=False, columns=['a', 'b', 'c'])</p>
-                            <p>json and excel</p>
-                        </li>
-                    </ul>
-                </section>
-            </section>
-            <section>
+             
                 <section data-background="#2c3e50" style="color: white; text-align: left;">
                     <h2 style="color: white">Summary</h2>
                     <ul>
-                        <li>Pandas</li>
-                        <ul>
-                            <li>Reading: Python for Data Analysis, Chapter 5 & 6</li>
-                        </ul>
+                        <li>Wordcloud</li>
+                        <li>Algorithm Intro</li>
+
                     </ul>
+                    
                 </section>
             </section>
         </div>
