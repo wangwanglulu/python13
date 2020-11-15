@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/theme/white.css">
     <link rel="stylesheet" href="css/theme/custom.css">
     <!-- Theme used for syntax highlighting of code -->
-    <link rel="stylesheet" href="lib/css/github-gist.css">
+    <link rel="stylesheet" href="lib/css/googlecode.css">
     <!-- Printing and PDF exports -->
     <script>
     var link = document.createElement('link');
@@ -25,438 +25,334 @@
         <div class="slides">
             <section data-background-video="bgm.mp4" data-background-video-loop data-background-video-muted style="text-align: left;">
                 <h2 style="color: white">Python Programming</h2>
-                <h5 style="color: white">Lecture 13 Wordcloud & Algorithm Intro</h5>
+                <h5 style="color: white">Lecture 13 Json, API and HTML Basics</h5>
             </section>
             <section>
                 <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">13.1 Wordcloud & Encoding</h2>
+                    <h2 style="color: white">13.1 Json and API</h2>
                 </section>
                 <section>
-                    <div class="fragment"><img data-src="wordcloud_ex.png" style="height: 400pt"></div>
-                </section>
-                <section>
-                    <ul>
-                        <li>A long string</li>
-                    </ul>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-from matplotlib import pyplot as plt
-from wordcloud import WordCloud
- 
-string = 'Importance of relative word frequencies for font-size. 
-With relative_scaling=0, only word-ranks are considered. With 
-relative_scaling=1, a word that is twice as frequent will have 
-twice the size. If you want to consider the word frequencies 
-and not only their rank, relative_scaling around .5 often looks good.'
+                    <h6>Write and Load</h6>
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+import json
 
-font = r'C:\Windows\Fonts\Arial.TTF'
-wc = WordCloud(font_path=font, #如果是中文必须要添加这个，否则会显示成框框
-               background_color='white',
-               width=1000,
-               height=800,
-               ).generate(string)
-wc.to_file('s1.png') #保存图片
-plt.imshow(wc)  #用plt显示图片
-plt.axis('off') #不显示坐标轴
-plt.show() #显示图片
+numbers = [2, 3, 5, 7, 11, 13]
+filename = 'numbers.json'
+with open(filename, 'w') as f_obj:
+    json.dump(numbers, f_obj)
 </code></pre>
+                        </div>
                     </div>
-                </section>
-                <section>
-                    <ul>
-                        <li>Loading text file</li>
-                    </ul>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-from matplotlib import pyplot as plt
-from wordcloud import WordCloud
- 
-filename = 'Harry Potter.txt'
-with open(filename , encoding="utf-8") as f_obj:
-    contents = f_obj.read()
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+import json
 
-font = r'C:\Windows\Fonts\Arial.TTF'
-wc = WordCloud(font_path=font, 
-               background_color='white',
-               width=1000,
-               height=800,
-               ).generate(contents)
-wc.to_file('s2.png') 
-plt.imshow(wc)  
-plt.axis('off') 
-plt.show() 
+filename = 'numbers.json'
+with open(filename) as f_obj:
+    numbers = json.load(f_obj)
+print(numbers)
 </code></pre>
+                        </div>
                     </div>
+                    <p class="fragment">JSON can't store every kind of Python value. It can contain values of only the following data types: strings, integers, floats, Booleans, lists, dictionaries, and NoneType. JSON cannot represent Python-specific objects, such as File objects, CSV Reader or Writer objects.</p>
                 </section>
                 <section>
-                    <ul>
-                        <li>Loading Chinese text file</li>
-                    </ul>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-from matplotlib import pyplot as plt
-from wordcloud import WordCloud
-
-filename = 'sanguo.txt'
-with open(filename , encoding="utf-8") as f_obj:
-    contents = f_obj.read()
-
-
-font = r'C:\Windows\Fonts\simkai.ttf'
-
-wc = WordCloud(font_path=font, 
-               background_color='white',
-               width=1000,
-               height=800,
-               ).generate(contents)
-wc.to_file('s3.png') 
-plt.imshow(wc)  
-plt.axis('off') 
-plt.show() 
-</code></pre>
-                </div>
-                </section>
-                <section>
-                 <ul>
-                    <li>Using jieba</li>
-                </ul>
-                <div class="fragment">
-                    <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-from matplotlib import pyplot as plt
-from wordcloud import WordCloud
-import jieba
-filename = 'sanguo.txt'
-with open(filename , encoding="utf-8") as f_obj:
-    contents = f_obj.read()
-
-s = jieba.lcut(contents) 
-txt = " ".join(s)
-print(txt)
-font = r'C:\Windows\Fonts\simkai.ttf'
-wc = WordCloud(font_path=font, 
-               background_color='white',
-               width=1000,
-               height=800,
-               ).generate(txt)
-wc.to_file('s4.png') 
-plt.imshow(wc)  
-plt.axis('off') 
-plt.show() 
-</code></pre>
-                </div>
-                </section>
-                <section>
-                    <h3>Character encoding Encoding</h3>
-                    <ul>
-                        <li>ASCII</li>
-                        <li>Unicode</li>
-                        <li>UTF-8</li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li>
-                            <p>Python Crash Couse (Chapters we do not cover: Chapter 12 - 14, 18 - 20)</p>
-                            <ul>
-                                <li>
-                                    <p>Chapter 12 -14: Alien Invasion</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 18 - 20: Django</p>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <p>Python for Everybody (Chapters we do not cover: Chapter 11 - 13, 15 - 16)</p>
-                            <ul>
-                                <li>
-                                    <p>Chapter 11: Regualer Expressions</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 12: Networked Programs 12.4 - 12.8 (urlib, BeautifulSoup)</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 13: Using Web Services (XML, JSON, API)</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 15: Databases and SQL</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 16: Visualizing data (Network, Word Cloud)</p>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-            </section>
-            <section>
-                <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">13.2 Algorithm Intro</h2>
-                </section>
-                <section>
-                   <div id="leftc"><img data-src="a2.jpg" style="height: 350pt"></div>
-                    <div id="rightc"><img data-src="a1.png" style="height: 350pt"></div>
-                </section>
-                <section>
-                    <ul>
-                        <li>Complexity, Big-O (Searching)</li>
-                        <li>Recursion, D&C</li>
-                        <li>Sorting Algorithms</li>
-                        <li>0/1 Knapsack Problem</li>
-                        <ul>
-                            <li>Greedy Algorithm</li>
-                            <li>Dynamic Programming</li>
-                        </ul>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li class="fragment">
-                            <p>Another stream of the basic knowledge about programming is <b>algorithm and data structure.</b></p>
-                        </li>
-                        <li class="fragment">
-                            <p>An algorithm is a set of instructions for accomplishing a task.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>Every piece of code could be called an algorithm.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>To learn this, you only need to know some basic algebra and Discrete mathematics.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>Let's start with a simple algorithm.</p>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h6>Binary Search</h6>
-                    <ul>
-                        <li class="fragment">
-                            <p>Binary search is an algorithm; its input is a sorted list of elements. If an element you’re looking for is in that list, binary search returns the position where it’s located. Otherwise, binary search returns null.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>Here's an example of how binary search works. I'm thinking of a number between 1 and 100.</p>
-                        </li>
-                    </ul>
-                    <div class="fragment"><img data-src="0.png" style="height: 100pt"></div>
-                </section>
-                <section>
-                    <ul>
-                        <li class="fragment">
-                            <p>You have to try to guess my number in the fewest tries possible. With every guess, I'll tell you if your guess is too low, too high, or correct.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>Suppose you start guessing like this: 1, 2, 3, 4 ...</p>
-                        </li>
-                        <li class="fragment">
-                            <p>If you perform a simple search, and my number was 99, it could take you 99 guesses to get there!</p>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li class="fragment">
-                            <p>Here’s a better technique. Start with 50.</p>
-                        </li>
-                    </ul>
-                    <div class="fragment"><img data-src="01.png" style="height: 200pt"></div>
-                    <div class="fragment"><img data-src="2.png" style="height: 200pt"></div>
-                </section>
-                <section>
-                    <div class="fragment"><img data-src="3.png" style="height: 200pt"></div>
-                    <div class="fragment"><img data-src="4.png" style="height: 100pt"></div>
-                    <ul>
-                        <li class="fragment">
-                            <p>In general, for any list of $n$, binary search will take $log_2n$ steps to run in the worst case, whereas simple search will take $n$ steps.
-                            </p>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li class="fragment">
-                            <p><b>Running time</b></p>
-                        </li>
-                        <li class="fragment">
-                            <p>Any time I talk about an algorithm, I'll discuss its running time. Generally you want to choose the most efficient algorithm— whether you're trying to optimize for time or space.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>For simple search, the maximum number of guesses is the same as the size of the list. This is called <b>linear time</b>.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>Binary search runs in <b>logarithmic time</b>.</p>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h6>Big O notation</h6>
-                    <ul>
-                        <li class="fragment">
-                            <p>Big O notation is special notation that tells you how fast an algorithm is.</p>
-                        </li>
-                    </ul>
-                    <div class="fragment"><img data-src="5.png" style="height: 120pt"></div>
-                    <ul>
-                        <li class="fragment">
-                            <p>You need to know how the running time increases as the list size increases. That’s where Big O notation comes in.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>Big O notation tells you how fast an algorithm is. For example, suppose you have a list of size n. Simple search needs to check each element, so it will take n operations. The run time in Big O notation is O(n).</p>
-                        </li>
-                        <li class="fragment">
-                            <p><b>Big O notation lets you compare the number of operations. It tells you how fast the algorithm grows. Run times grow at very different speeds</b></p>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li class="fragment">
-                            <p>Binary search needs log n operations to check a list of size n. It's $O(log n)$.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>Sometimes the performance of an algorithm depends on the exact values of the data rather than simply the size of the problem. For these kinds of algorithms we need to characterize their performance in terms of best case, <b>average case</b> and <b>worst-case</b> performance.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>$O(log n)$, $O(n)$, $O(n * log n)$, $O(n^2)$, $O(2^n)$, $O(n!)$ (P and NP)</p>
-                        </li>
-                    </ul>
-                    <div class="fragment"><img data-src="6.png" style="height: 300pt"></div>
-                </section>
-            </section>
-            <section>
-                <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">13.3 Recursion</h2>
-                </section>
-                <section>
-                    <h6>Base case and recursive case</h6>
+                    <h6 class="fragment">Web API</h6>
                     <div class="fragment">
                         <pre><code class="line-numbers" data-trim contenteditable>
-def fact(n):
-    if n==1:
-        return 1 #Base case
-    else:
-        return n * fact(n - 1) #recursive case
+import requests
+
+url = "http://t.weather.itboy.net/api/weather/city/101020100"
+r = requests.get(url)
+print(r.status_code)
+response_dict = r.json()  
 </code></pre>
                     </div>
-                    <ul>
-                        <li class="fragment">
-                            <p>The recursive case is when the function calls itself. The base case is when the function does not call itself again... so it doesn't go into an infinite loop.</p>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h6>The stack</h6>
                     <div class="fragment">
                         <pre><code class="line-numbers" data-trim contenteditable>
-def greet(name):
-    print('hello '+ name + '!')
-    greet2(name)
-    print('getting ready to say bye...')
-    bye()
+f = response_dict['data']
+ff = f['forecast']
+ff_today = ff[0]
+ff_1 = ff[1]
+ff_2 = ff[2]
 
-def greet2(name):
-    print('how are you, ' + name + '?')
-def bye():
-    print('Ok, bye!')
+def show(day):
+    for x in day:
+        print(x+': '+str(day[x]))
+    print('\n')
+show(ff_today)
+show(ff_1)
+show(ff_2)
 </code></pre>
                     </div>
-                    <div class="fragment"><img data-src="s1.png" style="height: 150pt"></div>
                 </section>
                 <section>
-                    <div class="fragment"><img data-src="s2.png" style="height: 150pt"></div>
-                    <div class="fragment"><img data-src="s3.png" style="height: 150pt"></div>
-                    <div class="fragment"><img data-src="s4.png" style="height: 150pt"></div>
-                </section>
-                <section>
-                    <h6>The call stack with recursion</h6>
-                    <div class="fragment"><img data-src="s5.png" style="height: 400pt"></div>
-                </section>
-                <section>
-                    <div class="fragment"><img data-src="s6.png" style="height: 400pt"></div>
-                </section>
-                <section>
-                    <div class="fragment"><img data-src="s7.png" style="height: 300pt"></div>
-                </section>
-                <section>
-                    <div class="fragment"><img data-src="s8.png" style="height: 300pt"></div>
-                </section>
-                <section>
-                    <h6>Divide and Conquer (D&C, 分而治之)</h6>
+                    <h6>Where to find Web API?</h6>
+                    <p class="fragment"><a href="https://github.com/toddmotto/public-apis">Public APIs</a>, <a href="https://www.juhe.cn/">聚合数据</a>, <a href="https://waditu.com/">Tushare</a></p>
+                    <h6 class="fragment">Stock Market (股票市场)</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+url="http://img1.money.126.net/data/hs/kline/day/history/2020/1399001.json"
+</code></pre>
+                    </div>
                     <ul>
-                        <li class="fragment">
-                            <p>D&C gives you a new way to think about solving problems. When you get a new problem, you don't have to be stumped. Instead, you can ask, "Can I solve this if I use divide and conquer?"</p>
-                        </li>
-                        <li class="fragment">
-                            <p>You want to divide this farm evenly into square plots. You want the plots to be as big as possible.</p>
-                        </li>
+                        <li class="fragment">代码为股票代码，上海股票前加0，如600756变成0600756，深圳股票前加1</li>
+                        <li class="fragment">大盘指数数据查询：上证指数000001前加0，沪深300指数000300股票前加0，深证成指399001前加1，中小板指399005前加1，创业板指399006前加1</li>
+                        <li class="fragment">是否复权，不复权为kline，复权为klinederc</li>
                     </ul>
-                    <div class="fragment"><img data-src="7.png" style="height: 120pt"></div>
-                    <div class="fragment"><img data-src="8.png" style="height: 150pt"></div>
+                    <p class="fragment">贵州茅台</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+url="http://img1.money.126.net/data/hs/kline/day/history/2020/0600519.json"
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+import requests
+import matplotlib.pyplot as plt
+import pandas as pd
+
+r = requests.get(url)
+print(r.status_code)
+response_dict = r.json() 
+# print(response_dict)
+</code></pre>
+                    </div>
                 </section>
                 <section>
-                    <ul>
-                        <li class="fragment">
-                            <p>To solve a problem using D&C, there are two steps:</p>
-                        </li>
-                        <li class="fragment">
-                            <p>1. Figure out the base case. This should be the simplest possible case.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>2. Divide or decrease your problem until it becomes the base case.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>What is the largest square size you can use? You have to reduce your problem. Let’s start by marking out the biggest boxes you can use.</p>
-                        </li>
-                    </ul>
-                    <div class="fragment"><img data-src="9.png" style="height: 200pt"></div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+data = response_dict['data']
+
+for x in data[:5]:
+    print("""日期: {}，开盘价：{}，收盘价：{}，最高价：{}
+        最低价：{}，交易量：{}，涨幅跌幅：{}""".format(x[0],\
+        x[1], x[2], x[3], x[4], x[5], x[6]))
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="output" data-trim contenteditable>
+200
+日期: 20200102，开盘价：1128.0，收盘价：1130.0，最高价：1145.06
+        最低价：1116.0，交易量：14809916，涨幅跌幅：-4.48
+日期: 20200103，开盘价：1117.0，收盘价：1078.56，最高价：1117.0
+        最低价：1076.9，交易量：13031878，涨幅跌幅：-4.55
+日期: 20200106，开盘价：1070.86，收盘价：1077.99，最高价：1092.9
+        最低价：1067.3，交易量：6341478，涨幅跌幅：-0.05
+日期: 20200107，开盘价：1077.5，收盘价：1094.53，最高价：1099.0
+        最低价：1076.4，交易量：4785359，涨幅跌幅：1.53
+日期: 20200108，开盘价：1085.05，收盘价：1088.14，最高价：1095.5
+        最低价：1082.58，交易量：2500825，涨幅跌幅：-0.58
+</code></pre>
+                    </div>
                 </section>
                 <section>
-                    <ul>
-                        <li class="fragment">
-                            <p>There’s a farm segment left to divide. <b>Why don’t you apply the same algorithm to this segment?</b></p>
-                        </li>
-                    </ul>
-                    <div class="fragment"><img data-src="10.png" style="height: 200pt"></div>
-                    <ul>
-                        <li class="fragment">
-                            <p>If you find the biggest box that will work for this size, that will be the biggest box that will work for the entire farm. You just reduced the problem from a 1680 × 640 farm to a 640 × 400 farm!</p>
-                        </li>
-                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+date=[]; open_p=[]; close_p=[]; high=[]
+low=[]; volume=[]; percent=[]
+for y in data:
+    date.append(y[0]); open_p.append(y[1])
+    close_p.append(y[2]); high.append(y[3])
+    low.append(y[4]); volume.append(y[5])
+    percent.append(y[6])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+plt.rcParams['font.sans-serif'] = ['SimHei'] 
+plt.style.use('ggplot')
+plt.plot(close_p, linewidth=0.5)
+plt.scatter(date,close_p, s=5)
+plt.xticks(date[::20],rotation=45,fontsize=6)
+plt.title('贵州茅台收盘价（2020）',fontsize=10)
+plt.tight_layout()
+plt.savefig('maotai2020.jpg',dpi=300)
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+data = {'日期':date, '开盘价': open_p, '收盘价':close_p, \
+        '最高':high, '最低':low,'交易量':volume,'涨幅跌幅':percent}
+df=pd.DataFrame(data)
+df.to_excel(excel_writer='茅台2020.xlsx',encoding='utf-8')
+</code></pre>
+                    </div>
                 </section>
                 <section>
-                    <div class="fragment"><img data-src="11.png" style="height: 150pt"></div>
-                    <div class="fragment"><img data-src="12.png" style="height: 150pt"></div>
-                    <div class="fragment"><img data-src="13.png" style="height: 150pt"></div>
+                    <div class="fragment"><img data-src='maotai2020.jpg' style="height: 450pt"></div>
                 </section>
                 <section>
-                    <div class="fragment"><img data-src="14.png" style="height: 150pt"></div>
+                    <p class="fragment">GitHub</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+url = 'https://api.github.com/search/repositories?q=language:python&sort=stars'
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+import requests
+
+URL = 'https://api.github.com/search/repositories?q=language:python&sort=star'
+r = requests.get(URL)
+print("Status code:", r.status_code)
+response_dict = r.json()
+print("Total repositories:", response_dict['total_count'])
+repo_dicts = response_dict['items']
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+names, stars = [], []
+for repo_dict in repo_dicts:
+    names.append(repo_dict['name'])
+    stars.append(repo_dict['stargazers_count'])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+plt.style.use('ggplot') 
+plt.barh(names, stars, color='green')
+plt.yticks(fontsize=7)
+plt.title('Github Repositories',fontsize=10)
+plt.tight_layout()
+plt.savefig('GR.jpg',dpi=300)
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src='GR.jpg' style="height: 500pt"></div>
+                </section>
+            </section>
+            </section>
+            <section>
+                <section data-background="#2980b9" style="color: white">
+                    <h2 style="color: white">13.2 HTML Basics</h2>
+                </section>
+                <section>
+                    <h5>IP, DNS, URL, Hypertext (F12)</h5>
+                    <div class="fragment"><img data-src="http.jpg" style="height: 200pt"></div>
+                    <div class="fragment"><img data-src="http0.png" style="height: 200pt"></div>
+                </section>
+                <section>
+                    <h5>Requests: GET, POST</h5>
+                    <div class="fragment"><img data-src="http1.png" style="height: 450pt"></div>
+                </section>
+                <section>
+                    <h5>Response</h5>
+                    <div class="fragment"><img data-src="http2.png" style="height: 300pt"></div>
+                </section>
+                <section>
+                    <h5>HTML, CSS, JavaScript</h5>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+<script>
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Lecture 13</title>
+</head>
+<body>
+    <div id="container">
+        <div class="wrapper">
+            <h2 class="title">Hello World</h2>
+            <p class="text">Hello, this is a paragraph</p>
+            <a href="http://www.baidu.com">Baidu</a>
+        </div>
+    </div>
+</body>
+</html>
+    
+</script>
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h5>HTML DOM</h5>
+                    <div class="fragment"><img data-src="htmltree.gif" style="height: 300pt"></div>
+                </section>
+                <section>
+                    <h5>CSS Selector</h5>
+                    <h5 class="fragment">id, class, tagname <a class="fragment" href="https://www.w3school.com.cn/cssref/css_selectors.asp">CSS Selector Reference</a></h5>
+                    <div class="div-a">
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+<script>
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="example.css">
+    <title>Lecture 13</title>
+</head>
+<body>
+    <div id="container">
+        <div class="wrapper">
+            <h2 class="title">Hello World</h2>
+            <p class="text">Hello, this is a paragraph</p>
+            <a href="http://www.baidu.com">Baidu</a>
+        </div>
+    </div>
+</body>
+</html>
+    
+</script>     
+                    </code></pre>
+                    </div>
+                    </div>
+                                        <div class="div-b">
+                    <div class="fragment">
+                        <pre><code  data-trim contenteditable>
+#container{
+    font-size: 50pt
+}
+.wrapper{
+    color: #a51f1f
+}
+div > p{
+    font-size: 20pt
+}   
+                    </code></pre>
+                    </div>
+                    </div>
+                </section>
+                <section data-background-image="bg.png">
+                    <div class="div-c">
+                    <h5>爬虫</h5>
                     <ul>
-                        <li class="fragment">
-                            <p>To recap, here's how D&C works: </p>
-                        </li>
-                        <li class="fragment">
-                            <p>1. Figure out a simple case as the base case. </p>
-                        </li>
-                        <li class="fragment">
-                            <p>2. Figure out how to reduce your problem and get to the base case. </p>
-                        </li>
-                        <li class="fragment">
-                            <p><b>D&C isn't a simple algorithm that you can apply to a problem. Instead, it's a way to think about a problem.</b></p>
-                        </li>
+                        <li>获取网页 (requests)</li>
+                        <li>提取信息 (BeautifulSoup, Pyquery)</li>
+                        <li>保存数据 (csv, xlsx, MySQL, MongoDB)</li>
+                        <li>JavaScript 渲染页面 (Selenium)</li>
+                        <li>八爪鱼，火车头</li>
+                        
                     </ul>
+                    </div>
+                    <div class="div-d">
+                    <h5>其他相关概念</h5>
+                    <ul>
+                        <li>静态网页和动态网页</li>
+                        <li>Ajax渲染</li>
+                        <li>Cookies, Session</li>
+                        <li>Proxy server</li>
+                        <li>分布式爬虫 (Scrapy)</li>
+                    </ul>
+                    </div>
                 </section>
             </section>
             
             <section>
-             
                 <section data-background="#2c3e50" style="color: white; text-align: left;">
                     <h2 style="color: white">Summary</h2>
                     <ul>
-                        <li>Wordcloud</li>
-                        <li>Algorithm Intro</li>
-
+                        <li>Reading: Python Crash Course, Chapter 16.2, 17</li>
                     </ul>
-                    
                 </section>
             </section>
         </div>
